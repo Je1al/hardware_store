@@ -3,6 +3,8 @@ package com.buildingstore.servlet;
 import com.buildingstore.data.Catalog;
 import com.buildingstore.model.Cart;
 import com.buildingstore.model.Product;
+import com.buildingstore.util.I18n;
+import com.buildingstore.util.Lang;
 import com.buildingstore.util.WebUtils;
 
 import jakarta.servlet.ServletException;
@@ -35,12 +37,16 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Cart cart = WebUtils.getCart(req);
+        Lang lang = WebUtils.getLang(req);
 
         req.setAttribute("cart", cart);
         req.setAttribute("cartItems", cart.getItems());
         req.setAttribute("cartCount", cart.getTotalCount());
         req.setAttribute("categories", catalog.getCategories());
         req.setAttribute("cur", WebUtils.getCurrency(req));
+        req.setAttribute("lang", lang);
+        req.setAttribute("langCode", lang.getCode());
+        req.setAttribute("t", I18n.bundle(lang));
         req.setAttribute("pagePathEnc", WebUtils.urlEncode("/cart"));
 
         WebUtils.consumeFlash(req);
@@ -73,7 +79,8 @@ public class CartServlet extends HttpServlet {
                         quantity = 1;
                     }
                     cart.add(product.get(), quantity);
-                    WebUtils.setFlashMessage(req, "Товар добавлен в корзину!");
+                    Lang lang = WebUtils.getLang(req);
+                    WebUtils.setFlashMessage(req, I18n.bundle(lang).get("flash.added"));
                 }
                 String redirect = WebUtils.safeLocalRedirect(req.getParameter("redirect"));
                 resp.sendRedirect(context + redirect);

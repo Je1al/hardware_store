@@ -18,6 +18,7 @@ public final class WebUtils {
 
     public static final String CART_ATTR = "cart";
     public static final String CURRENCY_COOKIE = "cur";
+    public static final String LANG_COOKIE = "lang";
     private static final String FLASH_MESSAGE = "flash.message";
     private static final String FLASH_ORDER = "flash.order";
 
@@ -32,6 +33,19 @@ public final class WebUtils {
             }
         }
         return Currency.RUB;
+    }
+
+    /** Текущий язык интерфейса из cookie (по умолчанию русский). */
+    public static Lang getLang(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (LANG_COOKIE.equals(cookie.getName())) {
+                    return Lang.from(cookie.getValue());
+                }
+            }
+        }
+        return Lang.RU;
     }
 
     /** URL-кодирование значения для подстановки в ссылку (например, параметр back). */

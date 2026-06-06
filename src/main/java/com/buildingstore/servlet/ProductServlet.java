@@ -3,7 +3,9 @@ package com.buildingstore.servlet;
 import com.buildingstore.data.Catalog;
 import com.buildingstore.model.Cart;
 import com.buildingstore.model.Product;
+import com.buildingstore.util.I18n;
 import com.buildingstore.util.Images;
+import com.buildingstore.util.Lang;
 import com.buildingstore.util.WebUtils;
 
 import jakarta.servlet.ServletException;
@@ -37,6 +39,7 @@ public class ProductServlet extends HttpServlet {
         }
 
         Cart cart = WebUtils.getCart(req);
+        Lang lang = WebUtils.getLang(req);
 
         req.setAttribute("product", product.get());
         req.setAttribute("productImage", Images.forProduct(getServletContext(), product.get()));
@@ -44,6 +47,9 @@ public class ProductServlet extends HttpServlet {
         req.setAttribute("cartCount", cart.getTotalCount());
         req.setAttribute("currentUrl", "/product/" + product.get().getId());
         req.setAttribute("cur", WebUtils.getCurrency(req));
+        req.setAttribute("lang", lang);
+        req.setAttribute("langCode", lang.getCode());
+        req.setAttribute("t", I18n.bundle(lang));
         req.setAttribute("pagePathEnc", WebUtils.urlEncode("/product/" + product.get().getId()));
 
         WebUtils.consumeFlash(req);

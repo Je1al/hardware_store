@@ -3,8 +3,9 @@ package com.buildingstore.servlet;
 import com.buildingstore.data.Catalog;
 import com.buildingstore.model.Cart;
 import com.buildingstore.model.Product;
+import com.buildingstore.util.I18n;
 import com.buildingstore.util.Images;
-import com.buildingstore.util.Plural;
+import com.buildingstore.util.Lang;
 import com.buildingstore.util.WebUtils;
 
 import jakarta.servlet.ServletException;
@@ -55,15 +56,19 @@ public class HomeServlet extends HttpServlet {
         applySort(products, sort);
 
         Cart cart = WebUtils.getCart(req);
+        Lang lang = WebUtils.getLang(req);
 
         req.setAttribute("sort", sort == null ? "" : sort);
         req.setAttribute("products", products);
         req.setAttribute("images", Images.forProducts(getServletContext(), products));
-        req.setAttribute("productCount", Plural.ru(products.size(), "товар", "товара", "товаров"));
+        req.setAttribute("productCount", I18n.count(lang, products.size()));
         req.setAttribute("categories", catalog.getCategories());
         req.setAttribute("cartCount", cart.getTotalCount());
         req.setAttribute("currentUrl", currentUrl);
         req.setAttribute("cur", WebUtils.getCurrency(req));
+        req.setAttribute("lang", lang);
+        req.setAttribute("langCode", lang.getCode());
+        req.setAttribute("t", I18n.bundle(lang));
         req.setAttribute("pagePathEnc", WebUtils.urlEncode(currentUrl));
 
         // Показать одноразовые flash-сообщения (товар добавлен / заказ оформлен)

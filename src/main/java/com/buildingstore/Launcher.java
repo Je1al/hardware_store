@@ -4,6 +4,7 @@ import com.buildingstore.servlet.CacheFilter;
 import com.buildingstore.servlet.CartServlet;
 import com.buildingstore.servlet.CurrencyServlet;
 import com.buildingstore.servlet.HomeServlet;
+import com.buildingstore.servlet.LangServlet;
 import com.buildingstore.servlet.ProductServlet;
 import com.buildingstore.servlet.SuggestServlet;
 
@@ -90,6 +91,9 @@ public class Launcher {
 
         Tomcat.addServlet(ctx, "currency", new CurrencyServlet());
         ctx.addServletMappingDecoded("/currency", "currency");
+
+        Tomcat.addServlet(ctx, "lang", new LangServlet());
+        ctx.addServletMappingDecoded("/lang", "lang");
 
         Tomcat.addServlet(ctx, "suggest", new SuggestServlet());
         ctx.addServletMappingDecoded("/api/suggest", "suggest");

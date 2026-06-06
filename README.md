@@ -1,167 +1,127 @@
-# 🏗️ СтройМаркет — магазин стройматериалов
+# StroyMarket — Building Materials Online Store
 
-Учебный веб-проект на **Java Servlet + JSP** со встроенным сервером **Apache Tomcat**.
-Каталог стройматериалов (8 категорий, 32 товара), поиск, фильтр по категориям,
-страница товара и полноценная корзина с оформлением заказа.
+A web application for an online hardware / building-materials store, built with
+**plain Java Servlets and JSP** running on an **embedded Apache Tomcat** server.
+No application server needs to be installed separately — the project starts as an
+ordinary Java application.
 
-> Цены актуализированы на **2026 год**, в футере указан **© 2026**.
-
----
-
-## 🧰 Технологии
-
-| Слой        | Технология                              |
-|-------------|------------------------------------------|
-| Язык        | Java 17                                  |
-| Веб         | Jakarta Servlet + JSP + JSTL 3.0         |
-| Сервер      | Встроенный Apache Tomcat 11 (embedded)   |
-| Сборка      | Maven (через Maven Wrapper — `mvnw`)     |
-| Данные      | In-memory (без БД)                       |
-
-Отдельно устанавливать Tomcat и Maven **не нужно** — сервер встроен в приложение,
-а Maven подтягивается через `mvnw`/`mvnw.cmd`.
+The catalogue (8 categories, 32 products) is stored in an **embedded H2 database**
+and accessed through JDBC.
 
 ---
 
-## ✅ Требования
+## Features
 
-- **JDK 17 или новее** — проверено на **JDK 17, 23 и 24**.
-  Проверить версию: `java -version`.
-
-> Tomcat 11 требует Java 17+. Код приложения компилируется под Java 17,
-> поэтому в Eclipse достаточно выбрать **JavaSE-17** в Build Path
-> (более новый JDK тоже подходит).
+- **Product catalogue** — 8 categories, 32 products with photos, prices and stock.
+- **Category filtering** and a **smart search** — multi-word, case- and «ё/е»-
+  insensitive, searching across name, category and description with relevance ranking.
+- **Live search suggestions** — an autocomplete dropdown backed by a JSON endpoint.
+- **Sorting** — by price (ascending / descending) and by name.
+- **Shopping cart** — stored in the HTTP session: add, change quantity, remove, clear.
+- **Checkout** — order form with validation (name, phone, address).
+- **Currency switch** — Russian ruble (₽) and Belarusian ruble (Br) with a fixed rate.
+- **Language switch** — Russian (default) and English interface.
+- **Embedded H2 database** — data persists between restarts; schema and seed data
+  are created automatically on first run.
+- **Optimisation** — gzip compression, browser caching of static assets, lazy-loaded
+  images.
 
 ---
 
-## ▶️ Запуск в IntelliJ IDEA
+## Tech stack
 
-1. **Open** → выберите папку проекта (IntelliJ сам импортирует Maven-проект).
-2. Дождитесь загрузки зависимостей.
-3. Откройте `src/main/java/com/buildingstore/Launcher.java` → зелёная стрелка
-   **Run 'Launcher.main()'**.
-4. Откройте **http://localhost:8080**.
+| Technology | Purpose |
+|---|---|
+| Java 17 | Implementation language |
+| Jakarta Servlet | HTTP request handling (controllers) |
+| JSP + JSTL | HTML rendering (view) |
+| Apache Tomcat 11 (embedded) | Servlet container |
+| H2 Database (embedded) | Data storage via JDBC |
+| Apache Maven | Build and dependency management |
+| HTML, CSS, JavaScript | Markup and the live search suggestions |
 
-> Если увидите ошибку компиляции JSP (`moduleNotFound` / `Unable to compile`),
-> значит проект запущен на слишком старой связке — убедитесь, что SDK проекта
-> **JDK 17 и новее** (File → Project Structure → Project SDK).
+---
 
-## ▶️ Запуск в Eclipse
+## Getting started
 
-1. **File → Import… → Maven → Existing Maven Projects**
-   (или **File → Open Projects from File System…**), выберите папку проекта.
-2. Дождитесь, пока Eclipse (m2e) скачает зависимости.
-3. Откройте `src/main/java/com/buildingstore/Launcher.java`.
-4. **ПКМ → Run As → Java Application** (или используйте готовую конфигурацию `Launcher`).
-5. В консоли появится `http://localhost:8080` — откройте в браузере.
+Requirements: **JDK 17+** (works up to JDK 24). Maven is optional — a Maven Wrapper
+(`mvnw`) is included.
 
-> Если Java-сборка подсвечена красным: **ПКМ по проекту → Maven → Update Project…**,
-> и убедитесь, что в **Build Path** выбран **JavaSE-17**.
+### Run from the command line
 
-## ▶️ Запуск из терминала
-
-**macOS / Linux:**
 ```bash
-./run.sh
+./mvnw compile exec:exec
 ```
 
-**Windows:**
-```bat
-run.bat
-```
+### Run from an IDE
 
-**Вручную (любая ОС):**
-```bash
-./mvnw compile exec:exec      # mvnw.cmd на Windows
-```
+Run the `main` method of the class **`com.buildingstore.Launcher`**
+(Run As → Java Application).
 
-После старта: **http://localhost:8080**
-Остановка сервера: **Ctrl+C**.
+Then open: **http://localhost:8080**
+
+On the first run the embedded database is created at `./data/buildingstore.mv.db`
+and filled with the catalogue automatically.
 
 ---
 
-## 📂 Структура проекта
+## Routes
+
+| Method | Path | Description |
+|---|---|---|
+| GET  | `/`                   | Catalogue (search, category filter, sorting) |
+| GET  | `/product/{id}`       | Product page |
+| GET  | `/cart`               | Shopping cart |
+| POST | `/cart/add/{id}`      | Add a product to the cart |
+| POST | `/cart/update/{id}`   | Change item quantity |
+| POST | `/cart/remove/{id}`   | Remove an item |
+| POST | `/cart/clear`         | Clear the cart |
+| POST | `/cart/checkout`      | Place an order |
+| GET  | `/?sort=price_asc`    | Sorting (`price_asc` / `price_desc` / `name`) |
+| GET  | `/api/suggest?q=...`  | JSON suggestions for the live search |
+| GET  | `/currency?c=BYN`     | Switch display currency |
+| GET  | `/lang?l=en`          | Switch interface language |
+
+---
+
+## Project structure
 
 ```
-buildingstore/
-├── pom.xml                       — Maven: зависимости и сборка (WAR)
-├── mvnw, mvnw.cmd, .mvn/         — Maven Wrapper (Maven ставить не нужно)
-├── run.sh, run.bat               — скрипты запуска
-├── Launcher.launch               — конфигурация запуска для Eclipse
-├── .project, .classpath, .settings — настройки Eclipse-проекта
+hardware_store/
+├── pom.xml                       — Maven build (WAR)
+├── mvnw, mvnw.cmd, .mvn/         — Maven Wrapper
 └── src/main/
     ├── java/com/buildingstore/
-    │   ├── Launcher.java          — точка входа: поднимает встроенный Tomcat
-    │   ├── data/Catalog.java      — каталог товаров и категорий (in-memory)
+    │   ├── Launcher.java          — entry point: starts embedded Tomcat
+    │   ├── db/Database.java       — embedded H2 connection and schema
+    │   ├── data/Catalog.java      — catalogue queries (JDBC) and search
     │   ├── model/                 — Product, Category, CartItem, Cart
-    │   ├── servlet/               — Home, Product, Cart, Currency
-    │   └── util/                  — Money, Currency, Plural, WebUtils
+    │   ├── servlet/               — Home, Product, Cart, Currency, Lang, Suggest
+    │   └── util/                  — Currency, Money, Lang, I18n, Plural, Images, WebUtils
     └── webapp/
-        ├── css/style.css          — стили
-        ├── img/                   — SVG-иллюстрации товаров и логотип
+        ├── css/style.css          — styles
+        ├── js/app.js              — live search suggestions
+        ├── img/                   — product images and logo
         └── WEB-INF/
             ├── views/             — index.jsp, product.jsp, cart.jsp, sprite.jspf
-            └── tags/price.tag     — вывод цены с символом валюты
+            └── tags/price.tag     — price output with the currency symbol
 ```
-
-## 🗺️ Маршруты (URL)
-
-| Метод | Путь                  | Назначение                       |
-|-------|-----------------------|----------------------------------|
-| GET   | `/`                   | каталог / поиск / фильтр         |
-| GET   | `/?search=...`        | поиск по названию и описанию     |
-| GET   | `/?category=slug`     | товары категории                 |
-| GET   | `/product/{id}`       | страница товара                  |
-| GET   | `/cart`               | просмотр корзины                 |
-| POST  | `/cart/add/{id}`      | добавить товар                   |
-| POST  | `/cart/update/{id}`   | изменить количество              |
-| POST  | `/cart/remove/{id}`   | удалить позицию                  |
-| POST  | `/cart/clear`         | очистить корзину                 |
-| POST  | `/cart/checkout`      | оформить заказ                   |
-| GET   | `/?sort=price_asc`    | сортировка (price_asc/desc/name) |
-| GET   | `/api/suggest?q=...`  | JSON-подсказки для живого поиска  |
-| GET   | `/currency?c=BYN`     | переключение валюты              |
 
 ---
 
-## 🔧 Что было сделано
+## Architecture
 
-Проект переведён с **Spring Boot** на **чистые сервлеты + JSP** и доведён до рабочего состояния:
+The application follows the **MVC** pattern. The embedded Tomcat passes each request
+to a servlet (controller); the servlet queries the data layer (`Catalog` over H2 via
+JDBC) and forwards to a JSP page (view) that renders the HTML response. The cart is
+kept in the user's session; interface text is resolved through the `I18n` dictionary
+depending on the selected language.
 
-- **Архитектура.** Spring MVC/JPA/Thymeleaf заменены на `HttpServlet` + JSP/JSTL;
-  данные хранятся в памяти (класс `Catalog`), корзина — в `HttpSession`.
-  Встроенный сервер — Apache Tomcat 11 (работает на JDK 17–24).
-- **Дизайн.** Чистая светлая минималистичная тема: спокойная палитра,
-  аккуратная типографика, без градиентов и эмодзи.
-- **Иконки.** Для каждой категории — свой линейный SVG-значок в боковом меню
-  (хранятся в спрайте `sprite.jspf`).
-- **Фото товаров и логотип.** Для всех 32 товаров добавлены реальные фото
-  (`img/photos/{id}.jpg|png|webp`) — показываются в каталоге и на карточке
-  товара (обрезка `cover`). Если фото для товара нет — автоматически
-  подставляется цветная SVG-иллюстрация категории (`img/{slug}.svg`).
-  Подбор картинки — класс `util/Images`. Логотип магазина — `img/logo.svg`.
-  Как заменить/добавить фото — см. `img/photos/КАК-ДОБАВИТЬ-ФОТО.txt`.
-- **Валюты.** Переключатель **₽ (рубль РФ) ↔ Br (бел. рубль)** в шапке.
-  Цены хранятся в рублях РФ и конвертируются (курс 1 BYN = 30 RUB, см. `util/Currency`);
-  для белорусского рубля используется отдельный знак (SVG). Выбор валюты
-  запоминается в cookie. Формат цены — тег `WEB-INF/tags/price.tag`.
-- **Умный поиск.** Многословный запрос, нормализация регистра и «ё»→«е»,
-  поиск по названию + категории + описанию с ранжированием по релевантности
-  (`Catalog.search`).
-- **Живые подсказки.** Автодополнение при вводе (выпадающий список товаров):
-  endpoint `/api/suggest` (JSON) + `js/app.js`. Поддержка стрелок/Esc.
-- **Сортировка** каталога: по цене (возр./убыв.) и по названию.
-- **Оптимизация.** gzip-сжатие текстовых ответов (HTML/CSS/JS/SVG/JSON),
-  кэш статики в браузере (`Cache-Control`, `CacheFilter`), сжатые фото
-  (~5 МБ вместо 30), ленивая загрузка картинок в каталоге.
-- **Дата.** Год в футере всех страниц → **2026**.
-- **Цены.** Актуализированы под 2026 год.
-- **Eclipse.** Добавлены `.project`, `.classpath`, `.settings`, `Launcher.launch`
-  и Maven Wrapper — проект открывается и запускается из Eclipse.
-- **Исправленные логические ошибки:**
-  - управление количеством в корзине (кнопки «+/−» раньше отправляли два
-    параметра `quantity` и не работали — теперь это три отдельные формы);
-  - кодировка кириллицы в POST-формах (имя/адрес приходили «крякозябрами»);
-  - защита от open-redirect в параметре `redirect`;
-  - оформление заказа блокируется при пустой корзине или незаполненных полях;
-  - корректная обработка несуществующих товаров/категорий и пустого поиска.
+---
+
+## Notes
+
+- Product names and descriptions are kept in their original (Russian) form; the
+  interface chrome, categories and units are translated when English is selected.
+- Currency conversion uses a fixed demo rate (1 BYN = 30 RUB).
+- The generated database (`data/`) and build output (`target/`) are git-ignored.
